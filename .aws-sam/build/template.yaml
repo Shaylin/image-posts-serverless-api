@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Image Posts Serverless Application
+Resources:
+  ImagePostsHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName:
+        Fn::Sub: ${AWS::StackName}-image-posts-handler
+      Description: Image Posts Serverless Application Handler
+      CodeUri: ImagePostsHandler
+      Handler: ServerlessAPI
+      Runtime: dotnet8
+      MemorySize: 1024
+      Tracing: Active
+      Timeout: 600
+      Environment:
+        Variables:
+          POSTS_TABLE:
+            Ref: PostsTable
+          COMMENTS_TABLE:
+            Ref: CommentsTable
+          IMAGE_BUCKET:
+            Ref: ImageStorageBucket
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: PostsTable
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: CommentsTable
+      - S3CrudPolicy:
+          BucketName:
+            Ref: ImageStorageBucket
+      Events:
+        ProxyResource:
+          Type: HttpApi
+          Properties:
+            PayloadFormatVersion: '2.0'
+            Path: /{proxy+}
+            Method: ANY
+        RootResource:
+          PayloadFormatVersion: '2.0'
+          Type: HttpApi
+          Properties:
+            Path: /
+            Method: ANY
+    Metadata:
+      SamResourceId: ImagePostsHandler
+  PostsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: posts
+      KeySchema:
+      - AttributeName: PostId
+        KeyType: HASH
+      AttributeDefinitions:
+      - AttributeName: PostId
+        AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+  CommentsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: comments
+      KeySchema:
+      - AttributeName: CommentId
+        KeyType: HASH
+      AttributeDefinitions:
+      - AttributeName: CommentId
+        AttributeType: S
+      - AttributeName: PostId
+        AttributeType: S
+      GlobalSecondaryIndexes:
+      - IndexName: PostIdIndex
+        KeySchema:
+        - AttributeName: PostId
+          KeyType: HASH
+        Projection:
+          ProjectionType: ALL
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+  ImageStorageBucket:
+    Type: AWS::S3::Bucket
+Outputs:
+  WebEndpoint:
+    Description: API Gateway Endpoint URL
+    Value:
+      Fn::Sub: https://${ImagePostsHandler}.execute-api.${AWS::Region}.amazonaws.com/
