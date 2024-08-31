@@ -1,3 +1,5 @@
+using System.Web;
+using Amazon;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
 using ImagePostsAPI.Entities;
@@ -56,7 +58,7 @@ public class PostRepository(
                 Caption = post.Caption,
                 CreatedAt = post.CreatedAt,
                 Creator = post.Creator,
-                ImageUrl = $"https://{Environment.GetEnvironmentVariable("IMAGE_BUCKET")}/{post.ImagePath}",
+                ImageUrl = $"https://{Environment.GetEnvironmentVariable("IMAGE_BUCKET")}.s3.{RegionEndpoint.AFSouth1.SystemName}.amazonaws.com/{HttpUtility.UrlEncode(post.ImagePath)}",
                 LastComments = sortedComments
             });
         }

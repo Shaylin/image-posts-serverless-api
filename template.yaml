@@ -83,18 +83,23 @@ Resources:
     Properties:
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
-        IgnorePublicAcls: false
         BlockPublicPolicy: false
+        IgnorePublicAcls: false
         RestrictPublicBuckets: false
   
-  ImageStorageBucketPublicReadPolicy:
+  PublicS3ReadPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
       Bucket: !Ref ImageStorageBucket
       PolicyDocument:
+        Version: "2012-10-17"
         Statement:
-          - Sid: PublicReadGetObject
-            Effect: Allow
+          - Effect: Allow
             Principal: "*"
             Action: "s3:GetObject"
-            Resource: !Sub "arn:aws:s3:::{!Ref ImageStorageBucket}/*"
+            Resource: !Join
+              - ""
+              - - "arn:aws:s3:::"
+                - !Ref ImageStorageBucket
+                - /* 
+              

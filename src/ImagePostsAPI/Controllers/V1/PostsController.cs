@@ -22,7 +22,8 @@ public class PostsController(
     : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<PostsResponse>> GetPosts([FromQuery] string? paginationToken, [FromQuery] int limit = 10)
+    public async Task<ActionResult<PostsResponse>> GetPosts([FromQuery] string? paginationToken,
+        [FromQuery] int limit = 10)
     {
         var response = await postRepository.GetPosts(paginationToken, limit);
 
@@ -31,7 +32,7 @@ public class PostsController(
 
     [RequestSizeLimit(100 * 1024 * 1024)]
     [HttpPost]
-    public async Task<ActionResult<Post>> CreatePost([FromForm] [Required] CreatePostRequest createPostRequest)
+    public async Task<ActionResult<PostResponse>> CreatePost([FromForm] [Required] CreatePostRequest createPostRequest)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 

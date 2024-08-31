@@ -20,7 +20,7 @@ builder.Services
     .AddControllers()
     .AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase; });
 
-var region = Environment.GetEnvironmentVariable("AWS_REGION") ?? RegionEndpoint.AFSouth1.SystemName;
+var region = RegionEndpoint.AFSouth1.SystemName;
 builder.Services
     .AddSingleton<IAmazonDynamoDB>(new AmazonDynamoDBClient(RegionEndpoint.GetBySystemName(region)))
     .AddSingleton<IAmazonS3>(new AmazonS3Client(RegionEndpoint.GetBySystemName(region)))
