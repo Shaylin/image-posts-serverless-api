@@ -22,9 +22,9 @@ public class PostsController(
     : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<PostsResponse>> GetPosts([FromQuery] string? startKey, [FromQuery] int limit = 10)
+    public async Task<ActionResult<PostsResponse>> GetPosts([FromQuery] string? paginationToken, [FromQuery] int limit = 10)
     {
-        var response = await postRepository.GetPosts(startKey, limit);
+        var response = await postRepository.GetPosts(paginationToken, limit);
 
         return Ok(response);
     }

@@ -26,12 +26,12 @@ public class PostRepository(
         return true;
     }
 
-    public async Task<PostsResponse> GetPosts(string? startKey = null, int limit = 10)
+    public async Task<PostsResponse> GetPosts(string? paginationToken = null, int limit = 10)
     {
         var scanConfig = new ScanOperationConfig
         {
             Limit = limit,
-            PaginationToken = startKey
+            PaginationToken = paginationToken
         };
 
         var response = context.FromScanAsync<Post>(scanConfig);

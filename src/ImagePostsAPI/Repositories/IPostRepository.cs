@@ -7,5 +7,5 @@ public interface IPostRepository
 {
     Task<bool> CreatePost(Post post);
 
-    Task<PostsResponse> GetPosts(string? startKey = null, int limit = 10);
+    Task<PostsResponse> GetPosts(string? paginationToken = null, int limit = 10);
 }

@@ -15,7 +15,7 @@ public class S3ImageStorageService(IAmazonS3 s3, IJpegEncoderService jpegEncoder
         var uploadRequest = new PutObjectRequest
         {
             InputStream = encodedImage,
-            BucketName = "image-posts-serverless-api-imagestoragebucket-7vdkuru0mnz3",
+            BucketName = Environment.GetEnvironmentVariable("IMAGE_BUCKET"),
             Key = imagePath,
             ContentType = "image/jpeg"
         };
