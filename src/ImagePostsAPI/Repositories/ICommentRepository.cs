@@ -8,5 +8,7 @@ public interface ICommentRepository
 
     Task<List<Comment>> GetComments(string postId);
 
+    Task<Comment?> GetComment(string commentId);
+    
     Task DeleteComment(string commentId);
 }

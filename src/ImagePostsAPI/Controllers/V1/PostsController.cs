@@ -14,7 +14,6 @@ namespace ImagePostsAPI.Controllers.V1;
 [Produces("application/json")]
 public class PostsController(
     ILogger<PostsController> logger,
-    IBookRepository bookRepository,
     IImageStorageService imageStorageService,
     ISortableIdentifierService identifierService,
     ITimeStampService timeStampService,
@@ -22,21 +21,12 @@ public class PostsController(
     ICommentRepository commentRepository)
     : ControllerBase
 {
-    private readonly IBookRepository _bookRepository = bookRepository;
-
     [HttpGet]
     public async Task<ActionResult<PostsResponse>> GetPosts([FromQuery] string? startKey, [FromQuery] int limit = 10)
     {
-        logger.LogInformation("Get posts request");
+        var response = await postRepository.GetPosts(startKey, limit);
 
-        return Ok(new Post()
-        {
-            PostId = "a",
-            Caption = "b",
-            Creator = "c",
-            ImagePath = "c",
-            CreatedAt = DateTime.Now
-        });
+        return Ok(response);
     }
 
     [RequestSizeLimit(100 * 1024 * 1024)]
@@ -88,7 +78,7 @@ public class PostsController(
 
         return !commentSuccessfullyWritten
             ? StatusCode(StatusCodes.Status500InternalServerError, "Failed to persist comment")
-            : Ok(commentId);
+            : Ok(comment);
     }
 
     [HttpDelete("{postId}/comments/{commentId}")]
@@ -96,6 +86,16 @@ public class PostsController(
         [FromBody] [Required] DeleteCommentRequest deleteCommentRequest)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var existingComment = await commentRepository.GetComment(commentId);
+
+        if (existingComment is null) return NotFound();
+
+        if (existingComment.Creator != deleteCommentRequest.Creator) return Unauthorized();
+
+        if (existingComment.PostId != postId) return Unauthorized();
+
+        await commentRepository.DeleteComment(commentId);
 
         return Ok();
     }

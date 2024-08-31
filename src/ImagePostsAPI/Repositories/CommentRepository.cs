@@ -31,6 +31,19 @@ public class CommentRepository(IDynamoDBContext context, ILogger<ICommentReposit
         return results.GetRemainingAsync();
     }
 
+    public Task<Comment?> GetComment(string commentId)
+    {
+        try
+        {
+            return context.LoadAsync<Comment>(commentId)!;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Fail to retrieve {} from comments table", commentId);
+            return null!;
+        }
+    }
+
     public async Task DeleteComment(string commentId)
     {
         await context.DeleteAsync<Comment>(commentId);

@@ -30,4 +30,8 @@
     <ProjectReference Include="..\..\src\ImagePostsAPI\ImagePostsAPI.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Repository\" />
+  </ItemGroup>
+
 </Project>

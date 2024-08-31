@@ -1,5 +1,7 @@
 # Image Posts Serverless API
 
+![image posts design](./ImagePostsDesign.png)
+
 ## Build Requirements
 
 * AWS CLI - [Install the AWS CLI](https://aws.amazon.com/cli/)

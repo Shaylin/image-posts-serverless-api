@@ -4,7 +4,7 @@ version = 0.1
 
 [default]
 [default.global.parameters]
-stack_name = "image-posts-serverless-api"
+stack_name = "image-posts-serverless"
 
 [default.build.parameters]
 cached = true

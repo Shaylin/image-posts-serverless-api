@@ -5,7 +5,10 @@ using ImagePostsAPI.Responses;
 
 namespace ImagePostsAPI.Repositories;
 
-public class PostRepository(IDynamoDBContext context, ILogger<IPostRepository> logger) : IPostRepository
+public class PostRepository(
+    IDynamoDBContext context,
+    ILogger<IPostRepository> logger,
+    ICommentRepository commentRepository) : IPostRepository
 {
     public async Task<bool> CreatePost(Post post)
     {
@@ -25,8 +28,6 @@ public class PostRepository(IDynamoDBContext context, ILogger<IPostRepository> l
 
     public async Task<PostsResponse> GetPosts(string? startKey = null, int limit = 10)
     {
-        var allPosts = new List<Post>();
-
         var scanConfig = new ScanOperationConfig
         {
             Limit = limit,
@@ -35,17 +36,37 @@ public class PostRepository(IDynamoDBContext context, ILogger<IPostRepository> l
 
         var response = context.FromScanAsync<Post>(scanConfig);
 
-        do
-        {
-            var results = await response.GetNextSetAsync();
-            allPosts = (List<Post>)allPosts.Concat(results);
-        } while (response.IsDone == false && allPosts.Count < limit);
+        var results = await response.GetRemainingAsync();
 
-        return await GetPostsResponse(response.PaginationToken, allPosts);
+        return await GetPostsResponse(response.PaginationToken, results);
     }
 
     private async Task<PostsResponse> GetPostsResponse(string postCursor, List<Post> posts)
     {
-        return null;
+        var postResponses = new List<PostResponse>();
+
+        foreach (var post in posts)
+        {
+            var comments = await commentRepository.GetComments(post.PostId);
+            var sortedComments = comments.OrderByDescending(x => x.CommentId).ToList();
+
+            postResponses.Add(new PostResponse()
+            {
+                PostId = post.PostId,
+                Caption = post.Caption,
+                CreatedAt = post.CreatedAt,
+                Creator = post.Creator,
+                ImageUrl = $"https://{Environment.GetEnvironmentVariable("IMAGE_BUCKET")}/{post.ImagePath}",
+                LastComments = sortedComments
+            });
+        }
+
+        var sortedResponses = postResponses.OrderByDescending(x => x.LastComments.Count).ToList();
+
+        return new PostsResponse
+        {
+            Posts = sortedResponses,
+            PostCursor = postCursor
+        };
     }
 }
