@@ -1,84 +1,102 @@
-using Asp.Versioning;
+using System.ComponentModel.DataAnnotations;
 using ImagePostsAPI.Entities;
 using ImagePostsAPI.Repositories;
+using ImagePostsAPI.Requests;
+using ImagePostsAPI.Responses;
+using ImagePostsAPI.Services.Identifier;
+using ImagePostsAPI.Services.ImageStorage;
+using ImagePostsAPI.Services.TimeStamp;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ImagePostsAPI.Controllers.V1;
 
-[ApiController]
-[ApiVersion("1.0")]
-[Route("api/[controller]")]
+[Route("v1/[controller]")]
 [Produces("application/json")]
-public class PostsController : ControllerBase
+public class PostsController(
+    ILogger<PostsController> logger,
+    IBookRepository bookRepository,
+    IImageStorageService imageStorageService,
+    ISortableIdentifierService identifierService,
+    ITimeStampService timeStampService,
+    IPostRepository postRepository,
+    ICommentRepository commentRepository)
+    : ControllerBase
 {
-    private readonly ILogger<PostsController> _logger;
-    private readonly IBookRepository _bookRepository;
+    private readonly IBookRepository _bookRepository = bookRepository;
 
-    public PostsController(ILogger<PostsController> logger, IBookRepository bookRepository)
-    {
-        _logger = logger;
-        _bookRepository = bookRepository;
-    }
-
-    // GET api/posts
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Book>>> Get([FromQuery] int limit = 10)
+    public async Task<ActionResult<PostsResponse>> GetPosts([FromQuery] string? startKey, [FromQuery] int limit = 10)
     {
-        if (limit <= 0 || limit > 100) return BadRequest("The limit should been between [1-100]");
+        logger.LogInformation("Get posts request");
 
-        return Ok(await _bookRepository.GetBooksAsync(limit));
-    }
-
-    // GET api/posts/5
-    [HttpGet("{postId}")]
-    public async Task<ActionResult<Book>> Get(Guid postId)
-    {
-        var result = await _bookRepository.GetByIdAsync(postId);
-
-        if (result == null)
+        return Ok(new Post()
         {
-            return NotFound();
-        }
-
-        return Ok(result);
+            PostId = "a",
+            Caption = "b",
+            Creator = "c",
+            ImagePath = "c",
+            CreatedAt = DateTime.Now
+        });
     }
 
-    // POST api/posts
+    [RequestSizeLimit(100 * 1024 * 1024)]
     [HttpPost]
-    public async Task<ActionResult<Book>> Post([FromBody] Book book)
+    public async Task<ActionResult<Post>> CreatePost([FromForm] [Required] CreatePostRequest createPostRequest)
     {
-        if (book == null) return ValidationProblem("Invalid input! Book not informed");
+        if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        var result = await _bookRepository.CreateAsync(book);
+        var postId = identifierService.Generate();
 
-        if (result)
+        var imagePath = await imageStorageService.ConvertAndStoreImage(postId, createPostRequest.PostImage);
+
+        if (imagePath is null) return StatusCode(StatusCodes.Status500InternalServerError, "Failed to upload image");
+
+        var post = new Post()
         {
-            return CreatedAtAction(
-                nameof(Get),
-                new { id = book.Id },
-                book);
-        }
-        else
-        {
-            return BadRequest("Fail to persist");
-        }
+            PostId = postId,
+            Caption = createPostRequest.Caption,
+            Creator = createPostRequest.Creator,
+            CreatedAt = timeStampService.GetUtcNow(),
+            ImagePath = imagePath,
+        };
+
+        var postSuccessfullyWritten = await postRepository.CreatePost(post);
+
+        return !postSuccessfullyWritten
+            ? StatusCode(StatusCodes.Status500InternalServerError, "Failed to persist post")
+            : Ok(post);
     }
 
-    // DELETE api/books/5
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(Guid id)
+    [HttpPost("{postId}/comments")]
+    public async Task<ActionResult<Comment>> CreateComment([FromRoute] string postId,
+        [FromBody] CreateCommentRequest createCommentRequest)
     {
-        if (id == Guid.Empty) return ValidationProblem("Invalid request payload");
+        if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        var bookRetrieved = await _bookRepository.GetByIdAsync(id);
+        var commentId = identifierService.Generate();
 
-        if (bookRetrieved == null)
+        var comment = new Comment()
         {
-            var errorMsg = $"Invalid input! No book found with id:{id}";
-            return NotFound(errorMsg);
-        }
+            CommentId = commentId,
+            Content = createCommentRequest.Content,
+            CreatedAt = timeStampService.GetUtcNow(),
+            Creator = createCommentRequest.Creator,
+            PostId = postId
+        };
 
-        await _bookRepository.DeleteAsync(bookRetrieved);
+        var commentSuccessfullyWritten = await commentRepository.CreateComment(comment);
+
+        return !commentSuccessfullyWritten
+            ? StatusCode(StatusCodes.Status500InternalServerError, "Failed to persist comment")
+            : Ok(commentId);
+    }
+
+    [HttpDelete("{postId}/comments/{commentId}")]
+    public async Task<IActionResult> DeleteComment([FromRoute] string postId, [FromRoute] string commentId,
+        [FromBody] [Required] DeleteCommentRequest deleteCommentRequest)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
         return Ok();
     }
 }

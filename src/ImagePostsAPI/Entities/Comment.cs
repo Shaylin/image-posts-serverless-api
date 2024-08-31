@@ -6,14 +6,14 @@ namespace ImagePostsAPI.Entities;
 public class Comment
 {
     [DynamoDBHashKey]
-    public string CommentId { get; set; }
+    public required string CommentId { get; set; }
     
     [DynamoDBGlobalSecondaryIndexHashKey]
-    public string PostId { get; set; }
+    public required string PostId { get; set; }
 
-    public string Content { get; set; }
+    public required string Content { get; set; }
 
-    public string Creator { get; set; }
+    public required string Creator { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public required DateTime CreatedAt { get; set; }
 }

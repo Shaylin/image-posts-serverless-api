@@ -6,11 +6,13 @@ namespace ImagePostsAPI.Entities;
 public class Post
 {
     [DynamoDBHashKey]
-    public string PostId { get; set; }
+    public required string PostId { get; set; }
 
-    public string Caption { get; set; }
+    public required string Caption { get; set; }
 
-    public string ImagePath { get; set; }
+    public required string ImagePath { get; set; }
 
-    public string Creator { get; set; }
+    public required string Creator { get; set; }
+    
+    public required DateTime CreatedAt { get; set; }
 }

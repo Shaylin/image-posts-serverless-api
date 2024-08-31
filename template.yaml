@@ -10,9 +10,9 @@ Resources:
       FunctionName: !Sub '${AWS::StackName}-image-posts-handler'
       Description: Image Posts Serverless Application Handler
       CodeUri: ./src/ImagePostsAPI/
-      Handler: ServerlessAPI
+      Handler: ImagePostsAPI
       Runtime: dotnet8
-      MemorySize: 1024
+      MemorySize: 2048
       Tracing: Active
       Timeout: 600
       Environment:
@@ -80,8 +80,3 @@ Resources:
   
   ImageStorageBucket:
     Type: AWS::S3::Bucket
-
-Outputs:
-  WebEndpoint:
-    Description: API Gateway Endpoint URL
-    Value: !Sub "https://${ImagePostsHandler}.execute-api.${AWS::Region}.amazonaws.com/"

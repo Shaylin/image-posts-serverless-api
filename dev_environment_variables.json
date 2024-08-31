@@ -1,0 +1,7 @@
+{
+  "ImagePostsHandler": {
+    "POSTS_TABLE": "posts",
+    "COMMENTS_TABLE": "comment",
+    "IMAGE_BUCKET": "image-posts-serverless-api-imagestoragebucket-7vdkuru0mnz3"
+  }
+}

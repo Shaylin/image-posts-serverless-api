@@ -1,4 +1,4 @@
-name: Infrastructure As Code Validation
+name: Unit Tests
 
 on:
   push:
@@ -16,14 +16,9 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
-          
-      - name: Install AWS SAM CLI
-        uses: aws-actions/setup-sam@v2
 
-      - name: SAM Build
-        run: |
-          sam build
+      - name: Install Dependencies
+        run: dotnet restore
 
-      - name: SAM Validate
-        run: |
-          sam validate
+      - name: Run Unit Tests
+        run: dotnet test
