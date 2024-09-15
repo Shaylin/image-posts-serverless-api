@@ -23,7 +23,7 @@ public class CommentRepository(IDynamoDBContext context, ILogger<ICommentReposit
 
     public Task<List<Comment>> GetComments(string postId)
     {
-        var results = context.QueryAsync<Comment>(postId, new QueryConfig()
+        var results = context.QueryAsync<Comment>(postId, new DynamoDBOperationConfig()
         {
             IndexName = "PostIdIndex"
         });

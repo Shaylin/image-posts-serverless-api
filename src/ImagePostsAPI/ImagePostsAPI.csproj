@@ -15,8 +15,13 @@
 
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.AspNetCoreServer.Hosting" Version="1.0.0" />
-    <PackageReference Include="AWSSDK.DynamoDBv2" Version="4.0.0-preview.2" />
-    <PackageReference Include="AWSSDK.S3" Version="4.0.0-preview.2" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.400.20" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.402.11" />
+    <PackageReference Include="Mediator.Abstractions" Version="2.1.7" />
+    <PackageReference Include="Mediator.SourceGenerator" Version="2.1.7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.5" />
     <PackageReference Include="Ulid" Version="1.3.4" />
   </ItemGroup>
