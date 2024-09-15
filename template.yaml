@@ -9,8 +9,8 @@ Resources:
     Properties:
       FunctionName: !Sub '${AWS::StackName}-image-posts-handler'
       Description: Image Posts Serverless Application Handler
-      CodeUri: ./src/ImagePostsAPI/
-      Handler: ImagePostsAPI
+      CodeUri: ./src/ImagePosts.Api/
+      Handler: ImagePosts.Api
       Runtime: dotnet8
       MemorySize: 2048
       Tracing: Active
