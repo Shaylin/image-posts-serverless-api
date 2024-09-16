@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using ImagePosts.Infrastructure.Repositories;
 using ImagePostsAPI.Entities;
-using ImagePostsAPI.Repositories;
 using ImagePostsAPI.Requests;
 using ImagePostsAPI.Responses;
 using ImagePostsAPI.Services.Identifier;
@@ -42,7 +42,7 @@ public class PostsController(
 
         if (imagePath is null) return StatusCode(StatusCodes.Status500InternalServerError, "Failed to upload image");
 
-        var post = new Post()
+        var post = new PostEntity()
         {
             PostId = postId,
             Caption = createPostRequest.Caption,
@@ -59,14 +59,14 @@ public class PostsController(
     }
 
     [HttpPost("{postId}/comments")]
-    public async Task<ActionResult<Comment>> CreateComment([FromRoute] string postId,
+    public async Task<ActionResult<CommentEntity>> CreateComment([FromRoute] string postId,
         [FromBody] CreateCommentRequest createCommentRequest)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
         var commentId = identifierService.Generate();
 
-        var comment = new Comment()
+        var comment = new CommentEntity()
         {
             CommentId = commentId,
             Content = createCommentRequest.Content,

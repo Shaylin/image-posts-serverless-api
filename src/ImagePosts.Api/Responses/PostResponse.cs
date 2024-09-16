@@ -14,5 +14,5 @@ public class PostResponse
 
     public required DateTime CreatedAt { get; set; }
 
-    public required List<Comment> LastComments { get; set; }
+    public required List<CommentEntity> LastComments { get; set; }
 }

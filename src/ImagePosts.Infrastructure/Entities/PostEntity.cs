@@ -3,7 +3,7 @@ using Amazon.DynamoDBv2.DataModel;
 namespace ImagePostsAPI.Entities;
 
 [DynamoDBTable("posts")]
-public class Post
+public class PostEntity
 {
     [DynamoDBHashKey]
     public required string PostId { get; set; }

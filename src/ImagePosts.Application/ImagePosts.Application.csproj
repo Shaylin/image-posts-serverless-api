@@ -8,6 +8,11 @@
 
     <ItemGroup>
       <PackageReference Include="Mediator.Abstractions" Version="2.1.7" />
+      <PackageReference Include="Riok.Mapperly" Version="3.6.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Incoming\" />
     </ItemGroup>
 
 </Project>
