@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Incoming\" />
+      <ProjectReference Include="..\ImagePosts.Domain\ImagePosts.Domain.csproj" />
     </ItemGroup>
 
 </Project>
