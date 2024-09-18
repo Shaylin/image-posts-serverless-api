@@ -1,5 +1,5 @@
+using ImagePosts.Application;
 using ImagePosts.Domain.Incoming.Requests;
-using ImagePostsAPI.Responses;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,14 +12,14 @@ public class PostsController(
     : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<PostsResponse>> GetPosts(
-        [FromQuery] string? paginationToken,
+    public async Task<ActionResult> GetPosts(
+        [FromQuery] string? startToken,
         [FromQuery] int limit = 10
     )
     {
-        var request = new GetPostsRequest { StartToken = paginationToken, Limit = limit };
+        var request = new GetPostsRequest { StartToken = startToken, Limit = limit };
 
-        var result = await mediator.Send(request);
+        var result = await mediator.Send(request.ToGetPostsQuery());
 
         return Ok(result);
     }

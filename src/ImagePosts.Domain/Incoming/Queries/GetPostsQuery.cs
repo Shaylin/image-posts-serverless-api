@@ -1,9 +1,9 @@
-using ImagePosts.Domain.Models;
+using ImagePosts.Domain.Outgoing.Responses;
 using Mediator;
 
 namespace ImagePosts.Domain.Incoming.Queries;
 
-public record GetPostsQuery : IQuery<IEnumerable<Post>>
+public record GetPostsQuery : IQuery<GetPostsResponse>
 {
     public string? StartToken { get; init; }
 

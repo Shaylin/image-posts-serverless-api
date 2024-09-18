@@ -1,13 +1,19 @@
 using ImagePosts.Domain.Incoming.Queries;
 using ImagePosts.Domain.Models;
+using ImagePosts.Domain.Outgoing.Responses;
 using Mediator;
 
 namespace ImagePosts.Application.Incoming.Queries;
 
-public class GetPostsQueryHandler: IQueryHandler<GetPostsQuery, IEnumerable<Post>>
+public class GetPostsQueryHandler : IQueryHandler<GetPostsQuery, GetPostsResponse>
 {
-    public ValueTask<IEnumerable<Post>> Handle(GetPostsQuery query, CancellationToken cancellationToken)
+    public async ValueTask<GetPostsResponse> Handle(GetPostsQuery query, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        return new GetPostsResponse
+        {
+            Posts = new List<Post>(),
+            NumberRemaining = 44,
+            EndToken = "Fake"
+        };
     }
 }
