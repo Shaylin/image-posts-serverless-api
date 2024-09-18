@@ -3,12 +3,10 @@ using Amazon;
 using Amazon.DynamoDBv2;
 using Amazon.S3;
 using Amazon.DynamoDBv2.DataModel;
-using ImagePostsAPI.Repositories;
 using ImagePostsAPI.Services.Encoding;
 using ImagePostsAPI.Services.Identifier;
 using ImagePostsAPI.Services.ImageStorage;
 using ImagePostsAPI.Services.TimeStamp;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,8 +27,7 @@ builder.Services
     .AddSingleton<ISortableIdentifierService, UlidSortableIdentifierService>()
     .AddSingleton<ITimeStampService, TimeStampService>()
     .AddScoped<IDynamoDBContext, DynamoDBContext>()
-    .AddScoped<ICommentRepository, CommentRepository>()
-    .AddScoped<IPostRepository, PostRepository>();
+    .AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
 
 builder.Services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
 

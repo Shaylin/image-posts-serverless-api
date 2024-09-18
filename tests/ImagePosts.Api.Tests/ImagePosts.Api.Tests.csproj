@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\ImagePostsAPI\ImagePostsAPI.csproj" />
+    <ProjectReference Include="..\..\src\ImagePosts.Api\ImagePosts.Api.csproj" />
   </ItemGroup>
 
 </Project>

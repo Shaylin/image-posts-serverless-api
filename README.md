@@ -93,11 +93,6 @@ item.
 This necessitated a separate table configured with a global secondary index.
 While this works reasonably well for now, a relational database would allow for easier additions of new features.
 
-### Implement A CQRS-Style Pattern
-
-Something like MediatR would be essential for scaling the features of this application.
-The controller is already handling a lot of logic. Quality would benefit from splitting up requests and their handlers.
-
 ### Implement More Robust Validation
 
 While some minimal model validation exists, there is no deeper inspection on the validity of the values of the model.
